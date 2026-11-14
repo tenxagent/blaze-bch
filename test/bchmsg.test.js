@@ -64,3 +64,30 @@ test('serialization: magic, compactSize(len) of the UTF-8 bytes, message', () =>
   assert.deepEqual([...long.subarray(25, 28)], [0xfd, 0x2c, 0x01]);
   assert.equal(long.length, 25 + 3 + 300);
 });
+
+// ---- high-S: noble's recoverPublicKey does not apply verify()'s low-S rule; pin the behaviour down ----
+import { secp256k1 } from '@noble/curves/secp256k1.js';
+import { sha256 } from '@noble/hashes/sha2.js';
+import { sha256d } from '../src/cashaddr.js';
+import { hash160 } from '../src/bchmsg.js';
+import { TEST_SK_LABEL } from './test-key.js';
+
+const sigB64 = (header, r, s) => Buffer.from(Uint8Array.of(header, ...secp256k1.Point.Fn.toBytes(r),
+  ...secp256k1.Point.Fn.toBytes(s))).toString('base64');
+
+test('high-S proofs verify, as in Electron Cash (flipping s cannot forge: the same key still signed)', () => {
+  const sk = sha256(new TextEncoder().encode(TEST_SK_LABEL));
+  const addr = encodeCashaddr('bitcoincash', 0, hash160(secp256k1.getPublicKey(sk, true)));
+  const message = 'Verifying that I control the following Nostr public key: (test)';
+  const digest = sha256d(bchMessageBytes(message));
+  const low = secp256k1.Signature.fromBytes(
+    secp256k1.sign(digest, sk, { prehash: false, format: 'recovered' }), 'recovered');
+  assert.equal(low.hasHighS(), false);
+  const n = secp256k1.Point.Fn.ORDER;
+  const high = new secp256k1.Signature(low.r, n - low.s, low.recovery ^ 1);
+  assert.equal(high.hasHighS(), true);
+  for (const [sig, label] of [[sigB64(31 + low.recovery, low.r, low.s), 'low-S'],
+    [sigB64(31 + high.recovery, high.r, high.s), 'high-S']]) {
+    assert.deepEqual(verifyBchMessage({ address: addr, message, signature: sig }), { ok: true }, label);
+  }
+});

@@ -32,7 +32,8 @@ Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies,
 - **BCH proof:** base64 of `header ‖ r ‖ s` (65 bytes) over
   `sha256d(0x18 "Bitcoin Signed Message:\n" ‖ compactSize(len) ‖ utf8(text))`. Header 31–34 means a compressed key
   (recovery id = header − 31). Headers 27–30 (uncompressed keys) are **rejected** with the reason `uncompressed-key-not-supported`.
-  Paytaca never makes them.
+  Paytaca never makes them. **High-S** proofs are accepted, as Electron Cash accepts them: flipping `s` makes a second valid
+  encoding of the same key's signature and cannot forge a binding (tested).
 - **A signed message does not name a network.** The same key hash verifies under `bitcoincash:` and `bchtest:`. A P2SH (type 1)
   address never matches a key signature.
 - **Nostr side:** standard NIP-01 id (`sha256` of `[0,pubkey,created_at,kind,tags,content]` as compact JSON) and BIP-340 signature.
