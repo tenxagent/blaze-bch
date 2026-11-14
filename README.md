@@ -21,6 +21,7 @@ and from an address to its npub.
 | CashAddr encode/decode + legacy base58check (`src/cashaddr.js`) | done, spec vectors pass |
 | BCH signed-message verify (`src/bchmsg.js`, Electron Cash / Paytaca format) | done, Electron Cash vectors pass |
 | BIP-340 + NIP-01 event verify (`src/nostr.js`) | done, all 19 BIP-340 vectors pass |
+| Bech32 + NIP-19 npub (`src/bech32.js`) | done, BIP-173 + NIP-19 vectors pass |
 | Binding verifier, relay publish/lookup, demo page, login demo | next |
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.
@@ -45,6 +46,11 @@ Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies,
 - CashAddr spec — bitcoincashorg/bitcoincash.org `spec/cashaddr.md` @ `3e2e6da8c38dab7ba12149d327bc4b259aaad684`
 - BIP-340 — bitcoin/bips `bip-0340/test-vectors.csv` @ `b34d9f751791d4feb22feff4f2ed00bcac83961b`
 - Signed messages — Electron-Cash/Electron-Cash `electroncash/tests/test_bitcoin.py` @ `7f4afadbf62a6daa1d6d0563d0951141ddcc6a7c`
+
+`test/fixtures/bech32.json` holds reference data copied from:
+
+- Bech32 — bitcoin/bips `bip-0173.mediawiki` @ `b34d9f751791d4feb22feff4f2ed00bcac83961b` (7 valid, 8 invalid strings; the cases that need raw control bytes are left out)
+- npub — nostr-protocol/nips `19.md` @ `1fb3a95f112920a05092ae030adf3d490fc2e9d1` (both hex ⇄ npub examples)
 
 `test/fixtures/nip01-event.json` is an event from a **public throwaway test key** (`test/test-key.js`). Its expected id was computed
 by a second, independent serializer (`scripts/nip01-id.py`, Python `json` + `hashlib`).

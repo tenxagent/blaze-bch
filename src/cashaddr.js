@@ -1,6 +1,7 @@
 // CashAddr (BCH address format) + legacy base58check, written from the spec:
 // https://github.com/bitcoincashorg/bitcoincash.org/blob/master/spec/cashaddr.md
 import { sha256 } from '@noble/hashes/sha2.js';
+import { convertBits } from './bits.js';
 
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 const GEN = [0x98f2bc8e61n, 0x79b76d99e2n, 0xf33e5fb3c4n, 0xae2eabe2a8n, 0x1e4f43e470n];
@@ -44,29 +45,6 @@ export function verifyChecksum(addr) {
   } catch {
     return false;
   }
-}
-
-// Regroup bits; strict on decode (no leftover non-zero padding, no extra group).
-function convertBits(data, from, to, pad) {
-  let acc = 0;
-  let bits = 0;
-  const out = [];
-  const maxv = (1 << to) - 1;
-  for (const v of data) {
-    acc = (acc << from) | v;
-    bits += from;
-    while (bits >= to) {
-      bits -= to;
-      out.push((acc >> bits) & maxv);
-    }
-    acc &= (1 << bits) - 1;
-  }
-  if (pad) {
-    if (bits > 0) out.push((acc << (to - bits)) & maxv);
-  } else if (bits >= from || acc !== 0) {
-    throw new Error('cashaddr: invalid padding');
-  }
-  return out;
 }
 
 export function encodeCashaddr(prefix, type, hash) {

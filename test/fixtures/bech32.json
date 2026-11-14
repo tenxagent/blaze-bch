@@ -1,0 +1,72 @@
+{
+ "note": "Reference test data only, extracted 2026-11-14 from upstream files at the pinned commits below. Third-party vectors, cited; not our code. Invalid strings that need raw non-ASCII/control bytes (written as \"0x.. +\" in the spec) are left out.",
+ "sources": {
+  "nip19": {
+   "repo": "nostr-protocol/nips",
+   "path": "19.md",
+   "commit": "1fb3a95f112920a05092ae030adf3d490fc2e9d1",
+   "sha256": "5b53c98637ae0cb8e6d99e1570e32da2c5842154ba898393439f334f1fd90aad"
+  },
+  "bip173": {
+   "repo": "bitcoin/bips",
+   "path": "bip-0173.mediawiki",
+   "commit": "b34d9f751791d4feb22feff4f2ed00bcac83961b",
+   "sha256": "b19eab06b264bbd15ad7f7d640fa34de8f4a8809fba8a6ecc3e165545b27a543"
+  }
+ },
+ "npub": [
+  {
+   "hex": "3bf0c63fcb93463407af97a5e5ee64fa883d107ef9e558472c4eb9aaaefa459d",
+   "npub": "npub180cvv07tjdrrgpa0j7j7tmnyl2yr6yr7l8j4s3evf6u64th6gkwsyjh6w6",
+   "where": "NIP-19 example"
+  },
+  {
+   "hex": "7e7e9c42a91bfef19fa929e5fda1b72e0ebc1a4c1141673e2794234d86addf4e",
+   "npub": "npub10elfcs4fr0l0r8af98jlmgdh9c8tcxjvz9qkw038js35mp4dma8qzvjptg",
+   "where": "NIP-19 test vector"
+  }
+ ],
+ "bech32_valid": [
+  "A12UEL5L",
+  "a12uel5l",
+  "an83characterlonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1tt5tgs",
+  "abcdef1qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw",
+  "11qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqc8247j",
+  "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w",
+  "?1ezyfcl"
+ ],
+ "bech32_invalid": [
+  {
+   "s": "an84characterslonghumanreadablepartthatcontainsthenumber1andtheexcludedcharactersbio1569pvx",
+   "reason": "overall max length exceeded"
+  },
+  {
+   "s": "pzry9x0s0muk",
+   "reason": "No separator character"
+  },
+  {
+   "s": "1pzry9x0s0muk",
+   "reason": "Empty HRP"
+  },
+  {
+   "s": "x1b4n0q5v",
+   "reason": "Invalid data character"
+  },
+  {
+   "s": "li1dgmt3",
+   "reason": "Too short checksum"
+  },
+  {
+   "s": "A1G7SGD8",
+   "reason": "checksum calculated with uppercase form of HRP"
+  },
+  {
+   "s": "10a06t8",
+   "reason": "empty HRP"
+  },
+  {
+   "s": "1qzzfhee",
+   "reason": "empty HRP"
+  }
+ ]
+}
