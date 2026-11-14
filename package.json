@@ -1,0 +1,20 @@
+{
+  "name": "blaze-bch",
+  "version": "1.0.0",
+  "description": "BCH <-> Nostr identity binding (NIP-39 kind 10011, bch: claim) - BCH BLAZE 2026 entry",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0"
+  },
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  }
+}

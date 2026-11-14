@@ -1,0 +1,21 @@
+{
+ "event": {
+  "pubkey": "c40e2da7be890e4edcf03f9e08f576f1a43ee2c882dcf4071a7dc83f7dbd5e15",
+  "created_at": 1700000000,
+  "kind": 10011,
+  "tags": [
+   [
+    "i",
+    "bch:bitcoincash:qpm2qsznhks23z7629mms6s4cwef74vcwvy22gdx6a",
+    "proof"
+   ],
+   [
+    "i",
+    "github:example",
+    "gist"
+   ]
+  ],
+  "content": "line1\nline2 \"quoted\" \\ back\ttab é 🔥 \u0001   end"
+ },
+ "python_id": "a3ce1c805b2f688aa5a9ab1fad891eb7e5ecbe2f8357c79383f5e409a5c16c64"
+}
