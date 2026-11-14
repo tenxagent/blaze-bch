@@ -23,6 +23,7 @@ and from an address to its npub.
 | BIP-340 + NIP-01 event verify (`src/nostr.js`) | done, all 19 BIP-340 vectors pass |
 | Bech32 + NIP-19 npub (`src/bech32.js`) | done, BIP-173 + NIP-19 vectors pass |
 | Binding verifier (`src/binding.js`): both signatures, per-claim reasons | done |
+| CLI (`bin/blaze-bch.js`): `text <npub>` prints the text to sign, `verify <event.json>` checks a binding | done |
 | Relay publish/lookup, demo page, login demo | next |
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.

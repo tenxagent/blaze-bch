@@ -16,5 +16,8 @@
   "type": "module",
   "engines": {
     "node": ">=22"
+  },
+  "bin": {
+    "blaze-bch": "bin/blaze-bch.js"
   }
 }
