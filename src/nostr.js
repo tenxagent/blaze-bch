@@ -1,17 +1,14 @@
 // NIP-01 event id + BIP-340 Schnorr verification. One verify path for everything (event checker and test vectors).
 import { schnorr } from '@noble/curves/secp256k1.js';
 import { sha256 } from '@noble/hashes/sha2.js';
+import { hexToBytes, bytesToHex } from './bytes.js';
 
-const HEX = /^(?:[0-9a-fA-F]{2})*$/;
 const LOWER_HEX = (n) => new RegExp(`^[0-9a-f]{${n}}$`);
 const ID_RE = LOWER_HEX(64);
 const SIG_RE = LOWER_HEX(128);
 
-const fromHex = (h) => {
-  if (typeof h !== 'string' || !HEX.test(h)) throw new Error('not hex');
-  return Uint8Array.from(Buffer.from(h, 'hex'));
-};
-const toHex = (u8) => Buffer.from(u8).toString('hex');
+const fromHex = hexToBytes;
+const toHex = bytesToHex;
 
 // BIP-340 verify. Returns a boolean and never throws (bad encodings, off-curve keys, out-of-range values => false).
 export function verifySchnorr(sigHex, msgHex, pubHex) {

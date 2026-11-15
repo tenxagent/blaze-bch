@@ -1,5 +1,6 @@
 // Bech32 (BIP-173, original constant 1, not bech32m) + NIP-19 npub, written from the specs.
 import { convertBits } from './bits.js';
+import { hexToBytes, bytesToHex } from './bytes.js';
 
 const CHARSET = 'qpzry9x8gf2tvdw0s3jn54khce6mua7l';
 const GEN = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3];
@@ -48,7 +49,7 @@ const HEX64 = /^[0-9a-f]{64}$/;
 
 export function npubEncode(hex) {
   if (typeof hex !== 'string' || !HEX64.test(hex)) throw new Error('npub: expected 64 lowercase hex chars');
-  return bech32Encode('npub', convertBits([...Buffer.from(hex, 'hex')], 8, 5, true));
+  return bech32Encode('npub', convertBits([...hexToBytes(hex)], 8, 5, true));
 }
 
 export function npubDecode(npub) {
@@ -56,5 +57,5 @@ export function npubDecode(npub) {
   if (hrp !== 'npub') throw new Error(`npub: wrong prefix ${JSON.stringify(hrp)}`);
   const bytes = convertBits(words, 5, 8, false);
   if (bytes.length !== 32) throw new Error('npub: payload must be 32 bytes');
-  return Buffer.from(bytes).toString('hex');
+  return bytesToHex(bytes);
 }

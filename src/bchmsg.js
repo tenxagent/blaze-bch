@@ -6,6 +6,7 @@ import { secp256k1 } from '@noble/curves/secp256k1.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { ripemd160 } from '@noble/hashes/legacy.js';
 import { decodeCashaddr, sha256d } from './cashaddr.js';
+import { base64ToBytes } from './bytes.js';
 
 const MAGIC = Uint8Array.of(0x18, ...new TextEncoder().encode('Bitcoin Signed Message:\n'));
 
@@ -27,8 +28,12 @@ export function bchMessageBytes(message) {
 }
 
 function decodeSignature(b64) {
-  if (typeof b64 !== 'string' || !/^[A-Za-z0-9+/]+={0,2}$/.test(b64)) throw new Error('signature: not base64');
-  const sig = Uint8Array.from(Buffer.from(b64, 'base64'));
+  let sig;
+  try {
+    sig = base64ToBytes(b64);
+  } catch {
+    throw new Error('signature: not base64');
+  }
   if (sig.length !== 65) throw new Error(`signature: expected 65 bytes, got ${sig.length}`);
   return sig;
 }
