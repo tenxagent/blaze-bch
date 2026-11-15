@@ -24,7 +24,8 @@ and from an address to its npub.
 | Bech32 + NIP-19 npub (`src/bech32.js`) | done, BIP-173 + NIP-19 vectors pass |
 | Binding verifier (`src/binding.js`): both signatures, per-claim reasons | done |
 | CLI (`bin/blaze-bch.js`): `text <npub>` prints the text to sign, `verify <event.json>` checks a binding | done |
-| Relay publish/lookup, demo page, login demo | next |
+| Relay I/O (`src/relay.js`): publish, npub → address, address → npub; newest valid event wins; a reverse hit is re-checked against that key's newest binding, so a replaced binding counts as revoked | done (tested on an in-memory relay) |
+| Live relay test, demo page, login demo | next |
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.
 
