@@ -25,7 +25,8 @@ and from an address to its npub.
 | Binding verifier (`src/binding.js`): both signatures, per-claim reasons | done |
 | CLI (`bin/blaze-bch.js`): `text <npub>` prints the text to sign, `verify <event.json>` checks a binding | done |
 | Relay I/O (`src/relay.js`): publish, npub → address, address → npub; newest valid event wins; a reverse hit is re-checked against that key's newest binding, so a replaced binding counts as revoked | done (tested on an in-memory relay) |
-| Live relay test, demo page, login demo | next |
+| Live relay test (`scripts/make-live-events.mjs` → leak gate → `scripts/live-relay-test.mjs`) | done 2026-11-15: 6/6 relays accept; forward + reverse lookup work on all 6; after a newer claim-free event both return nothing (`docs/live-relay-test-2026-11-15.json`) |
+| Demo page (verifier + pay-by-identity), login demo | next |
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.
 

@@ -1,0 +1,37 @@
+{
+ "address": "bitcoincash:qpzzxhwv7ee9ks2vsmv67zag8fnd43llmypqe93jpe",
+ "pubkey": "33d2dcf3c551ad1a0c85abdeb4f9c9e5b5330e1c9e1adad5d8a9ae595b2b494c",
+ "publishBinding": [
+  "wss://nos.lol OK",
+  "wss://relay.primal.net OK",
+  "wss://offchain.pub OK",
+  "wss://nostr.mom OK",
+  "wss://relay.nostr.net OK",
+  "wss://relay.snort.social OK"
+ ],
+ "forward": [
+  "bitcoincash:qpzzxhwv7ee9ks2vsmv67zag8fnd43llmypqe93jpe"
+ ],
+ "reverse": [
+  "npub1x0fdeu792xk35ry9400tf7wfuk6nxrsuncdd44wc4xh9jketf9xql3ag7c"
+ ],
+ "reverseByRelay": {
+  "wss://nos.lol": 1,
+  "wss://relay.primal.net": 1,
+  "wss://offchain.pub": 1,
+  "wss://nostr.mom": 1,
+  "wss://relay.nostr.net": 1,
+  "wss://relay.snort.social": 1
+ },
+ "publishRevoke": [
+  "wss://nos.lol OK",
+  "wss://relay.primal.net OK",
+  "wss://offchain.pub OK",
+  "wss://nostr.mom OK",
+  "wss://relay.nostr.net OK",
+  "wss://relay.snort.social OK"
+ ],
+ "forwardAfterRevoke": [],
+ "reverseAfterRevoke": 0,
+ "allAsExpected": true
+}
