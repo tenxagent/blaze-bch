@@ -32,6 +32,10 @@ and from an address to its npub.
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.
 
+## For other apps
+
+[`docs/NIP-39-bch.md`](docs/NIP-39-bch.md) proposes `bch` as a NIP-39 claim type: tag format, proof bytes, the two checks, discovery both ways and revocation. Any Nostr client or BCH wallet can adopt it without this code.
+
 ## Formats (exact bytes)
 
 - **Claim tag:** `["i", "bch:" + cashaddr, proof]`. The cashaddr is lowercase **with** its prefix (`bitcoincash:` or `bchtest:`).
