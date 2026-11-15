@@ -5,6 +5,10 @@ import { verifyEvent } from './nostr.js';
 import { verifyBinding, BINDING_KIND } from './binding.js';
 import { decodeCashaddr } from './cashaddr.js';
 
+// The six public relays the 2026-11-15 live test passed on (publish, #i reverse lookup, replacement).
+export const DEFAULT_RELAYS = ['wss://nos.lol', 'wss://relay.primal.net', 'wss://offchain.pub', 'wss://nostr.mom', 'wss://relay.nostr.net',
+  'wss://relay.snort.social'];
+
 const defaults = (opts = {}) => ({ connect: (url) => new WebSocket(url), timeoutMs: 8000, ...opts });
 let subCounter = 0;
 

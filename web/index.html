@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>blaze-bch: BCH ⇄ Nostr identity</title>
+<link rel="icon" href="data:,">
+<script type="importmap">
+{ "imports": { "@noble/curves/": "./vendor/noble-curves/", "@noble/hashes/": "./vendor/noble-hashes/" } }
+</script>
+<style>
+  :root { --bg: #fafaf7; --fg: #1d1d1b; --muted: #6b6b66; --card: #ffffff; --line: #e3e2dc; --ok: #1f7a3f; --bad: #b3261e; --accent: #0a7c5a; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141413; --fg: #ecebe6; --muted: #a3a29b; --card: #1d1d1b; --line: #33322f; --ok: #5cc98a; --bad: #f08a80; --accent: #4fd1a5; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 0 0 10px; }
+  .muted { color: var(--muted); font-size: 13px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-top: 16px; }
+  input, textarea { width: 100%; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 8px; border: 1px solid var(--line);
+    border-radius: 6px; background: var(--bg); color: var(--fg); }
+  textarea { min-height: 64px; resize: vertical; }
+  button { font: inherit; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+  button.ghost { background: transparent; color: var(--accent); }
+  button:disabled { opacity: .5; cursor: default; }
+  .row { display: flex; gap: 8px; margin-top: 8px; }
+  .row > input { flex: 1; }
+  .out { margin-top: 10px; font-size: 14px; word-break: break-all; }
+  .ok { color: var(--ok); } .bad { color: var(--bad); }
+  code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
+  ol { padding-left: 20px; margin: 0; } li { margin-bottom: 12px; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>BCH ⇄ Nostr identity</h1>
+  <div class="muted">Two keys vouch for each other: the Nostr key signs the event, the BCH key signs the npub. Everything is checked here, in your browser, from public relays.
+    Built by an AI agent (Claude) with a human operator.</div>
+
+  <section>
+    <h2>Look up</h2>
+    <div class="row"><input id="q" placeholder="npub1… or bitcoincash:q…" autocomplete="off" spellcheck="false"><button id="lookup">Look up</button></div>
+    <div id="lookupOut" class="out"></div>
+    <div id="pay" hidden>
+      <div class="row"><input id="amount" placeholder="amount in BCH (optional)" inputmode="decimal"><button id="payBtn" class="ghost">Payment link</button></div>
+      <div id="payOut" class="out"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Link your BCH address</h2>
+    <ol>
+      <li><button id="connect">Connect Nostr signer</button> <span id="who" class="muted">needs a NIP-07 extension (nos2x, Alby…)</span></li>
+      <li>Sign this text in your BCH wallet (Paytaca or Electron Cash: <em>Sign message</em>):
+        <div class="row"><input id="text" readonly placeholder="connect first"><button id="copy" class="ghost">Copy</button></div></li>
+      <li>Paste the address you signed with and the signature:
+        <input id="addr" placeholder="bitcoincash:q…" style="margin-top:8px" autocomplete="off" spellcheck="false">
+        <textarea id="sig" placeholder="signature (base64)" style="margin-top:8px" spellcheck="false"></textarea></li>
+      <li><button id="publish" disabled>Sign &amp; publish</button> <span class="muted">your other identity claims are kept</span>
+        <div id="pubOut" class="out"></div></li>
+    </ol>
+  </section>
+
+  <div class="muted" style="margin-top:16px" id="relays"></div>
+</main>
+<script type="module" src="./app.js"></script>
+</body>
+</html>

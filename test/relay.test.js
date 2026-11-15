@@ -84,3 +84,9 @@ test('dead and silent relays do not block a lookup (timeout per relay)', async (
   assert.deepEqual(r.verified, [addr]);
   assert.ok(Date.now() - t0 < timeoutMs * 3, 'relays are queried in parallel');
 });
+
+test('DEFAULT_RELAYS = the six relays the live test passed on, all wss://', async () => {
+  const { DEFAULT_RELAYS } = await import('../src/relay.js');
+  assert.equal(DEFAULT_RELAYS.length, 6);
+  assert.ok(DEFAULT_RELAYS.every((u) => u.startsWith('wss://')));
+});

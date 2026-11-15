@@ -3,11 +3,10 @@
 // (same author, newer, no claim) and checks that both lookups now return nothing. Prints one JSON summary; exit 0 = all as expected.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { publish, lookupByPubkey, lookupByAddress } from '../src/relay.js';
+import { publish, lookupByPubkey, lookupByAddress, DEFAULT_RELAYS } from '../src/relay.js';
 import { verifyBinding } from '../src/binding.js';
 
-export const RELAYS = ['wss://nos.lol', 'wss://relay.primal.net', 'wss://offchain.pub', 'wss://nostr.mom', 'wss://relay.nostr.net',
-  'wss://relay.snort.social'];
+const RELAYS = DEFAULT_RELAYS;
 const dir = process.argv[2];
 const binding = JSON.parse(readFileSync(join(dir, 'binding.json'), 'utf8'));
 const revoke = JSON.parse(readFileSync(join(dir, 'revoke.json'), 'utf8'));
