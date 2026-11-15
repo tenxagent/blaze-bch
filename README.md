@@ -27,7 +27,7 @@ and from an address to its npub.
 | Relay I/O (`src/relay.js`): publish, npub → address, address → npub; newest valid event wins; a reverse hit is re-checked against that key's newest binding, so a replaced binding counts as revoked | done (tested on an in-memory relay) |
 | Live relay test (`scripts/make-live-events.mjs` → leak gate → `scripts/live-relay-test.mjs`) | done 2026-11-15: 6/6 relays accept; forward + reverse lookup work on all 6; after a newer claim-free event both return nothing (`docs/live-relay-test-2026-11-15.json`) |
 | Pay by identity (`src/pay.js`) + binding composer that keeps the user's other claims (`src/compose.js`) | done |
-| Demo page (`web/`): look up npub ⇄ address, payment link, link an address with a NIP-07 signer + pasted BCH signature | lookup + payment link checked in headless Chrome against live relays; signer path next |
+| Demo page (`web/`): look up npub ⇄ address, payment link, link an address with a NIP-07 signer + pasted BCH signature | done: lookup checked in headless Chrome on the live relays; the full link flow (injected test signer → publish → lookups → payment link, an existing GitHub claim kept) checked in headless Chrome against a local relay (`?relays=ws://127.0.0.1:…`, `test/local-relay.mjs`) |
 | Login demo (challenge-response) | next |
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.

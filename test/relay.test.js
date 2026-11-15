@@ -90,3 +90,12 @@ test('DEFAULT_RELAYS = the six relays the live test passed on, all wss://', asyn
   assert.equal(DEFAULT_RELAYS.length, 6);
   assert.ok(DEFAULT_RELAYS.every((u) => u.startsWith('wss://')));
 });
+
+test('relaysFromQuery: ?relays= overrides the defaults; wss:// anywhere, plain ws:// only for localhost', async () => {
+  const { relaysFromQuery, DEFAULT_RELAYS } = await import('../src/relay.js');
+  assert.deepEqual(relaysFromQuery(''), DEFAULT_RELAYS);
+  assert.deepEqual(relaysFromQuery('?relays=wss://a.example,ws://127.0.0.1:7777'), ['wss://a.example', 'ws://127.0.0.1:7777']);
+  assert.deepEqual(relaysFromQuery('?relays=ws://localhost:1'), ['ws://localhost:1']);
+  assert.deepEqual(relaysFromQuery('?relays=ws://evil.example,https://x.example'), DEFAULT_RELAYS, 'no valid relay => defaults');
+  assert.deepEqual(relaysFromQuery('?relays=ws://evil.example,wss://ok.example'), ['wss://ok.example']);
+});

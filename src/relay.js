@@ -103,3 +103,19 @@ export async function lookupByAddress(address, urls, opts) {
   }
   return out;
 }
+
+// Relay list from a page's query string (?relays=a,b). wss:// is accepted for any host; plain ws:// only for localhost (local tests).
+// Nothing valid => the defaults.
+export function relaysFromQuery(search) {
+  const raw = new URLSearchParams(search).get('relays');
+  if (!raw) return DEFAULT_RELAYS;
+  const ok = raw.split(',').map((s) => s.trim()).filter((s) => {
+    try {
+      const u = new URL(s);
+      return u.protocol === 'wss:' || (u.protocol === 'ws:' && ['127.0.0.1', 'localhost'].includes(u.hostname));
+    } catch {
+      return false;
+    }
+  });
+  return ok.length ? ok : DEFAULT_RELAYS;
+}

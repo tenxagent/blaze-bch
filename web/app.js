@@ -1,5 +1,5 @@
 // Demo page glue. All logic lives in ../src (unit-tested); relay data is untrusted, so it only ever reaches the DOM via textContent.
-import { DEFAULT_RELAYS, lookupByPubkey, lookupByAddress, publish } from '../src/relay.js';
+import { relaysFromQuery, lookupByPubkey, lookupByAddress, publish } from '../src/relay.js';
 import { verificationText, verifyBinding } from '../src/binding.js';
 import { composeBinding } from '../src/compose.js';
 import { paymentUri } from '../src/pay.js';
@@ -14,8 +14,9 @@ const el = (tag, text, cls) => {
 };
 const show = (box, ...nodes) => box.replaceChildren(...nodes);
 const line = (text, cls) => el('div', text, cls);
+const RELAYS = relaysFromQuery(location.search);
 
-$('relays').textContent = `Relays: ${DEFAULT_RELAYS.map((u) => u.replace('wss://', '')).join(' · ')}`;
+$('relays').textContent = `Relays: ${RELAYS.map((u) => u.replace('wss://', '')).join(' · ')}`;
 
 // ---- look up: npub -> address (+ payment link), or address -> npubs ----
 let payAddress = null;
@@ -26,14 +27,14 @@ $('lookup').onclick = async () => {
   show(out, line('Asking the relays…', 'muted'));
   try {
     if (q.startsWith('npub1')) {
-      const r = await lookupByPubkey(npubDecode(q), DEFAULT_RELAYS);
+      const r = await lookupByPubkey(npubDecode(q), RELAYS);
       if (!r || !r.verified.length) return show(out, line('No verified BCH address for this npub.', 'bad'));
       payAddress = r.verified[0];
       $('pay').hidden = false;
       return show(out, line('✓ Nostr signature and ✓ BCH signature both verified here.', 'ok'),
         ...r.verified.map((a) => line(a)), ...r.rejected.map((x) => line(`✗ ${x.address}: ${x.reason}`, 'bad')));
     }
-    const found = await lookupByAddress(q, DEFAULT_RELAYS);
+    const found = await lookupByAddress(q, RELAYS);
     if (!found.length) return show(out, line('No npub currently proves this address.', 'bad'));
     show(out, line('✓ Current bindings (both signatures verified here):', 'ok'), ...found.map((x) => line(x.npub)));
   } catch (e) {
@@ -76,14 +77,14 @@ $('publish').onclick = async () => {
   $('publish').disabled = true;
   try {
     show(out, line('Reading your current claims…', 'muted'));
-    const current = await lookupByPubkey(pubkey, DEFAULT_RELAYS);
+    const current = await lookupByPubkey(pubkey, RELAYS);
     const unsigned = composeBinding({ pubkey, address: $('addr').value.trim().toLowerCase(), proof: $('sig').value.trim(),
       current: current?.event ?? null });
     const signed = await window.nostr.signEvent(unsigned);
     const check = verifyBinding(signed);
     if (!check.ok || !check.verified.length) throw new Error(`signed event does not verify (${check.reason ?? 'no bound address'})`);
     show(out, line('Publishing…', 'muted'));
-    const res = await publish(signed, DEFAULT_RELAYS);
+    const res = await publish(signed, RELAYS);
     show(out, line(`✓ Bound ${check.verified.join(', ')}`, 'ok'),
       ...res.map((r) => line(`${r.url.replace('wss://', '')}: ${r.ok ? 'accepted' : `refused (${r.message})`}`, r.ok ? 'muted' : 'bad')));
   } catch (e) {
