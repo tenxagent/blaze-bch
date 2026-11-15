@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>blaze-bch: log in with either key</title>
+<link rel="icon" href="data:,">
+<script type="importmap">
+{ "imports": { "@noble/curves/": "./vendor/noble-curves/", "@noble/hashes/": "./vendor/noble-hashes/" } }
+</script>
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<main>
+  <h1>Log in with either key</h1>
+  <div class="muted">This page plays the app: it issues a one-time challenge, checks your answer, then finds your other key on the relays.
+    In a real app the check runs on its server. Built by an AI agent (Claude) with a human operator.</div>
+
+  <section>
+    <h2>Nostr key</h2>
+    <button id="nostrLogin">Log in with Nostr signer</button>
+    <div id="nostrOut" class="out"></div>
+  </section>
+
+  <section>
+    <h2>BCH key</h2>
+    <div class="muted">Sign this text in your BCH wallet (Sign message), then paste the address and signature:</div>
+    <textarea id="chText" readonly style="margin-top:8px;min-height:92px"></textarea>
+    <input id="addr" placeholder="bitcoincash:q…" style="margin-top:8px" autocomplete="off" spellcheck="false">
+    <textarea id="sig" placeholder="signature (base64)" style="margin-top:8px" spellcheck="false"></textarea>
+    <div class="row"><button id="bchLogin">Log in with BCH</button></div>
+    <div id="bchOut" class="out"></div>
+  </section>
+
+  <div class="muted" style="margin-top:16px"><a href="./index.html">← Look up and link</a> · <span id="relays"></span></div>
+</main>
+<script type="module" src="./login.js"></script>
+</body>
+</html>

@@ -8,32 +8,7 @@
 <script type="importmap">
 { "imports": { "@noble/curves/": "./vendor/noble-curves/", "@noble/hashes/": "./vendor/noble-hashes/" } }
 </script>
-<style>
-  :root { --bg: #fafaf7; --fg: #1d1d1b; --muted: #6b6b66; --card: #ffffff; --line: #e3e2dc; --ok: #1f7a3f; --bad: #b3261e; --accent: #0a7c5a; }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #141413; --fg: #ecebe6; --muted: #a3a29b; --card: #1d1d1b; --line: #33322f; --ok: #5cc98a; --bad: #f08a80; --accent: #4fd1a5; }
-  }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 system-ui, -apple-system, Segoe UI, sans-serif; }
-  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
-  h1 { font-size: 22px; margin: 0 0 4px; }
-  h2 { font-size: 16px; margin: 0 0 10px; }
-  .muted { color: var(--muted); font-size: 13px; }
-  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-top: 16px; }
-  input, textarea { width: 100%; font: 13px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; padding: 8px; border: 1px solid var(--line);
-    border-radius: 6px; background: var(--bg); color: var(--fg); }
-  textarea { min-height: 64px; resize: vertical; }
-  button { font: inherit; padding: 7px 14px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
-  button.ghost { background: transparent; color: var(--accent); }
-  button:disabled { opacity: .5; cursor: default; }
-  .row { display: flex; gap: 8px; margin-top: 8px; }
-  .row > input { flex: 1; }
-  .out { margin-top: 10px; font-size: 14px; word-break: break-all; }
-  .ok { color: var(--ok); } .bad { color: var(--bad); }
-  code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; }
-  ol { padding-left: 20px; margin: 0; } li { margin-bottom: 12px; }
-  a { color: var(--accent); }
-</style>
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 <main>
@@ -64,6 +39,8 @@
         <div id="pubOut" class="out"></div></li>
     </ol>
   </section>
+
+  <div class="muted" style="margin-top:16px"><a href="./login.html">Login demo →</a></div>
 
   <div class="muted" style="margin-top:16px" id="relays"></div>
 </main>
