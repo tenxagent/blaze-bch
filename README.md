@@ -14,6 +14,61 @@ carrying the tag `["i", "bch:<cashaddr>", "<base64 BCH signed message>"]`. The B
 Anyone can check both signatures locally. Relays index the `i` tag, so a lookup works both ways: from an npub to its address,
 and from an address to its npub.
 
+## How it works
+
+**Linking (once per address).**
+
+1. The user's Nostr signer (NIP-07) gives the page the npub.
+2. The user signs `Verifying that I control the following Nostr public key: <npub>` in any BCH wallet, using *Sign message*.
+3. The page builds a kind `10011` event. It keeps every claim the user already has (GitHub, X…) and adds `["i", "bch:<address>", <signature>]`.
+4. The Nostr signer signs the event, and the page publishes it to several relays.
+
+**Checking (anyone, any time, offline once the event is fetched).**
+
+1. The event's id and BIP-340 signature must be valid, which shows the Nostr key published it.
+2. For each `bch:` claim, recover the public key from the BCH signature over the text **with this event's npub**. Its `hash160` must equal the
+   address payload, which shows the BCH key named this npub.
+3. A proof copied into someone else's event fails step 2, because it names the original npub.
+
+**Discovery.**
+
+- **npub → address:** read the author's kind `10011` from several relays and keep the newest valid one.
+- **address → npub:** relays index the claim tag (`#i`). Every hit is re-checked against that author's newest event, so a replaced claim counts as revoked.
+
+**Login.** The app issues a one-time nonce bound to its origin and an expiry. The user answers with either key: a Nostr kind `27235` event, or a
+BCH signed message. The app verifies the answer locally, then looks up the other key.
+
+| Module | Job |
+|---|---|
+| `src/cashaddr.js`, `src/bech32.js`, `src/bits.js`, `src/bytes.js` | encodings (CashAddr, legacy base58check, bech32/npub, hex/base64) |
+| `src/bchmsg.js` | BCH signed-message verify (Electron Cash / Paytaca format) |
+| `src/nostr.js` | NIP-01 id + BIP-340 verify (one verify path for everything) |
+| `src/binding.js` | the two-way check, with a reason for every rejected claim |
+| `src/relay.js` | publish, forward + reverse lookup, newest-wins, revocation |
+| `src/compose.js` | builds the event, keeping the user's other claims |
+| `src/pay.js` | npub → verified address → payment URI |
+| `src/auth.js` | challenge-response login with either key |
+| `bin/blaze-bch.js` | CLI: `text <npub>`, `verify <event.json>` |
+| `web/` | demo pages (`index.html` look up + link, `login.html`), with exactly the noble files they load vendored |
+
+## Trust and limits
+
+- **Relays are not trusted to tell the truth.** A relay can hide events but cannot forge them, because every event and proof is verified in the
+  browser. Reading several relays covers one that hides events or is stale.
+- **No server of ours** stores anything. The demo pages are static files.
+- **Revocation works by replacement.** It is only as fast as the relays that receive the newer event. A BCH-transaction commitment would give a
+  global order, and that is a stretch goal not built yet.
+- **Scope:** P2PKH addresses with compressed keys, which is what Paytaca and Electron Cash make today. Uncompressed-key signatures are refused
+  with a reason. P2SH or multisig claims are out of scope.
+- The page builds the DOM only with `textContent`, so relay data is never inserted as HTML.
+
+## Run it
+
+- `npm test`: unit tests, including every vector set and a real-WebSocket relay test (Node ≥ 22, no network).
+- `node bin/blaze-bch.js text <npub>` / `node bin/blaze-bch.js verify event.json`
+- Serve the repo root with any static server and open `web/index.html`. `?relays=wss://a,wss://b` picks other relays; plain `ws://` is
+  allowed only for localhost testing.
+
 ## Status
 
 | Part | State |
