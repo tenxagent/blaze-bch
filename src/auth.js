@@ -50,3 +50,21 @@ export function createLoginVerifier() {
     },
   };
 }
+
+// Plain-language reasons for the login page. The code stays at the end so a bug report can quote it.
+const REFUSALS = {
+  expired: 'This challenge has expired. Sign the new text shown above',
+  replayed: 'This challenge was already used to log in once. Sign the new text shown above',
+  'wrong-origin': 'The signed event names another site, not this one',
+  'wrong-challenge': 'The signed event answers a different challenge than the one shown above',
+  'wrong-kind': 'The signer returned an event of another kind than a login event',
+  'stale-event': 'The event time is more than a minute away from this computer\'s clock',
+  malformed: 'The address, signature or event could not be read (expected a CashAddr address and a base64 signature)',
+  'bad-id': 'The event was changed after it was signed, so its id does not match',
+  'bad-signature': 'The Nostr signature does not check out for this key',
+  'address-mismatch': 'The signature was not made by this address\'s key over the text shown above. Check the address; '
+    + 'after every login the page shows a new challenge, so a signature from an earlier login no longer fits',
+  'recovery-failed': 'No public key could be recovered from this signature',
+  'uncompressed-key-not-supported': 'This signature comes from an uncompressed key; only compressed-key (P2PKH) addresses are supported',
+};
+export const refusalText = (reason) => (REFUSALS[reason] ? `${REFUSALS[reason]} (${reason})` : reason);

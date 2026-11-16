@@ -1,5 +1,5 @@
 // Login demo glue. Logic: ../src/auth.js (challenge + verifier) and ../src/relay.js (find the other key). Relay data -> textContent only.
-import { makeChallenge, challengeText, createLoginVerifier, LOGIN_KIND } from '../src/auth.js';
+import { makeChallenge, challengeText, createLoginVerifier, refusalText, LOGIN_KIND } from '../src/auth.js';
 import { relaysFromQuery, lookupByPubkey, lookupByAddress } from '../src/relay.js';
 import { npubEncode } from '../src/bech32.js';
 
@@ -23,7 +23,7 @@ $('nostrLogin').onclick = async () => {
     const signed = await window.nostr.signEvent({ kind: LOGIN_KIND, created_at: Math.floor(Date.now() / 1000), content: '',
       tags: [['u', challenge.origin], ['method', 'LOGIN'], ['challenge', challenge.nonce]] });
     const r = verifier.verifyNostr(signed, challenge);
-    if (!r.ok) return show(out, line(`Refused: ${r.reason}`, 'bad'));
+    if (!r.ok) return show(out, line(`Refused: ${refusalText(r.reason)}`, 'bad'));
     show(out, line(`✓ Logged in as ${npubEncode(r.pubkey)}`, 'ok'), line('Looking for a bound BCH address…', 'muted'));
     const b = await lookupByPubkey(r.pubkey, RELAYS);
     show(out, line(`✓ Logged in as ${npubEncode(r.pubkey)}`, 'ok'),
@@ -38,7 +38,7 @@ $('nostrLogin').onclick = async () => {
 $('bchLogin').onclick = async () => {
   const out = $('bchOut');
   const r = verifier.verifyBch({ address: $('addr').value.trim(), signature: $('sig').value.trim() }, challenge);
-  if (!r.ok) return show(out, line(`Refused: ${r.reason}`, 'bad'));
+  if (!r.ok) return show(out, line(`Refused: ${refusalText(r.reason)}`, 'bad'));
   show(out, line(`✓ Logged in as ${r.address}`, 'ok'), line('Looking for a bound npub…', 'muted'));
   const found = await lookupByAddress(r.address, RELAYS);
   show(out, line(`✓ Logged in as ${r.address}`, 'ok'),

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { makeChallenge, challengeText, createLoginVerifier, LOGIN_KIND } from '../src/auth.js';
+import { makeChallenge, challengeText, createLoginVerifier, refusalText, LOGIN_KIND } from '../src/auth.js';
 import { NOSTR_SK, BCH_SK, OTHER_SK, nostrPubkey, bchAddress, signBch, signEvent } from './helpers.js';
 
 const ORIGIN = 'https://demo.example';
@@ -57,4 +57,30 @@ test('BCH login: a signed message over the challenge text logs the address in; r
     { ok: false, reason: 'address-mismatch' });
   assert.deepEqual(v.verifyBch({ address: addr, signature: signBch(BCH_SK, challengeText(c2)) }, c2, NOW + 301), { ok: false, reason: 'expired' });
   assert.deepEqual(v.verifyBch({ address: addr, signature: 'junk!' }, c2, NOW + 10), { ok: false, reason: 'malformed' });
+});
+
+test('every login refusal has a plain-language explanation, distinct per code, with the code kept at the end', () => {
+  const codes = ['expired', 'replayed', 'wrong-origin', 'wrong-challenge', 'wrong-kind', 'stale-event', 'malformed', 'bad-id',
+    'bad-signature', 'address-mismatch', 'recovery-failed', 'uncompressed-key-not-supported'];
+  const texts = codes.map((code) => {
+    const t = refusalText(code);
+    assert.ok(t.endsWith(` (${code})`), code);
+    assert.ok(t.length > code.length + 30, `${code} has a real sentence`);
+    return t;
+  });
+  assert.equal(new Set(texts).size, codes.length);
+  assert.equal(refusalText('some-new-code'), 'some-new-code', 'unknown codes pass through unchanged');
+});
+
+test('a BCH signature sent again after a login is refused, and the text says each login issues a new challenge', () => {
+  const v = createLoginVerifier();
+  const addr = bchAddress(BCH_SK);
+  const first = ch();
+  const sig = signBch(BCH_SK, challengeText(first));
+  assert.equal(v.verifyBch({ address: addr, signature: sig }, first, NOW + 10).ok, true);
+  const next = ch(); // the page shows a new challenge after every login
+  const r = v.verifyBch({ address: addr, signature: sig }, next, NOW + 12);
+  assert.deepEqual(r, { ok: false, reason: 'address-mismatch' });
+  assert.match(refusalText(r.reason), /new challenge/);
+  assert.match(refusalText(r.reason), /text shown above/);
 });
