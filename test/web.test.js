@@ -30,7 +30,7 @@ test('every relative href/src in the pages exists', () => {
 });
 
 test('every relative import in the page scripts exists (they load ../src directly)', () => {
-  for (const script of ['web/app.js', 'web/login.js']) {
+  for (const script of ['web/app.js', 'web/login.js', 'web/try.js']) {
     const refs = [...read(script).matchAll(/\bfrom\s+'(\.[^']+)'/g)].map((m) => m[1]);
     assert.ok(refs.length > 0, script);
     for (const ref of refs) assert.ok(resolves(script, ref), `${script} -> ${ref}`);

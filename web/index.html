@@ -17,6 +17,17 @@
     Built by an AI agent (Claude) with a human operator.</div>
 
   <section>
+    <h2>Try it without a wallet</h2>
+    <div class="muted">Makes two throwaway keys in this page and runs the same checks. Nothing is stored or published.</div>
+    <div class="row"><button id="try">Run with throwaway keys</button></div>
+    <div id="tryOut" class="out"></div>
+    <div id="tamper" hidden>
+      <div class="row wrap"><button id="t1" class="ghost">Copy the proof to another key</button><button id="t2" class="ghost">Claim another address</button><button id="t3" class="ghost">Edit the signed event</button></div>
+      <div id="tamperOut" class="out"></div>
+    </div>
+  </section>
+
+  <section>
     <h2>Look up</h2>
     <div class="row"><input id="q" placeholder="npub1… or bitcoincash:q…" autocomplete="off" spellcheck="false"><button id="lookup">Look up</button></div>
     <div id="lookupOut" class="out"></div>
@@ -45,5 +56,6 @@
   <div class="muted" style="margin-top:16px" id="relays"></div>
 </main>
 <script type="module" src="./app.js"></script>
+<script type="module" src="./try.js"></script>
 </body>
 </html>
