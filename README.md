@@ -14,6 +14,13 @@ carrying the tag `["i", "bch:<cashaddr>", "<base64 BCH signed message>"]`. The B
 Anyone can check both signatures locally. Relays index the `i` tag, so a lookup works both ways: from an npub to its address,
 and from an address to its npub.
 
+## Try it in one minute
+
+Open the demo (the link is in the submission, or serve this repo and open `web/index.html`) and press **Try it without a wallet**.
+The page makes two throwaway keys, links them, and checks both signatures (✓). Then press the three buttons below it: a copied proof,
+a borrowed address and an edited event are each refused, with the reason. Nothing is stored or published. `web/login.html` shows
+logging in with either key.
+
 ## How it works
 
 **Linking (once per address).**
@@ -124,4 +131,4 @@ by a second, independent serializer (`scripts/nip01-id.py`, Python `json` + `has
 
 ## License
 
-MIT
+MIT, see [`LICENSE`](LICENSE). The vendored noble files in `web/vendor/` keep their own MIT licenses.
