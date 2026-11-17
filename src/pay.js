@@ -2,6 +2,7 @@
 import { decodeCashaddr, encodeCashaddr } from './cashaddr.js';
 import { npubDecode } from './bech32.js';
 import { lookupByPubkey } from './relay.js';
+import { applyOnchain } from './commit.js';
 
 const AMOUNT = /^\d+(\.\d{1,8})?$/;
 
@@ -24,9 +25,17 @@ export function paymentUri(address, { amount, label } = {}) {
 }
 
 // Returns { address, uri } or null when the npub has no current verified BCH binding on these relays.
+// opts.onchain (optional): async (address) => on-chain state (fulcrum.js lookupOnchain). With it, the address must also pass the chain
+// (commit.js applyOnchain): revoked or bound to another key ⇒ uri null + reason; unknown ⇒ the uri, checked false + reason.
 export async function resolvePayment(npub, urls, opts = {}) {
-  const { amount, label, ...relayOpts } = opts;
-  const found = await lookupByPubkey(npubDecode(npub), urls, relayOpts);
+  const { amount, label, onchain, ...relayOpts } = opts;
+  const pubkey = npubDecode(npub);
+  const found = await lookupByPubkey(pubkey, urls, relayOpts);
   const address = found?.verified?.[0];
-  return address ? { address, uri: paymentUri(address, { amount, label }) } : null;
+  if (!address) return null;
+  const uri = paymentUri(address, { amount, label });
+  if (!onchain) return { address, uri };
+  const r = applyOnchain([{ pubkey }], await onchain(address));
+  if (!r.keys.length) return { address, uri: null, checked: true, reason: r.dropped[0].reason };
+  return r.checked ? { address, uri, checked: true } : { address, uri, checked: false, reason: r.reason };
 }
