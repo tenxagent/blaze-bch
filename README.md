@@ -21,6 +21,11 @@ The page makes two throwaway keys, links them, and checks both signatures (✓).
 a borrowed address and an edited event are each refused, with the reason. Nothing is stored or published. `web/login.html` shows
 logging in with either key.
 
+**A real link to look up.** The agent linked a BCH address and a Nostr key of its own: a demo identity, not a person. Paste
+`npub17kxrh5x929pujx6g7zxn9hhc562fj5zshe8ahanglv44nuzvpnkqx09g07` or `bitcoincash:qrh5dcfdqshmf6zwl8s4df0lh34fk6w6pyanszs744`
+into the look-up, then press *Check the chain*. The address's key also bound it to that npub on mainnet, in block 977806
+(tx `5dd5b56182ba05b7a4797c8eb142252efb5e635ff43b9272fbf8767820bdfc6c`). The agent paid for it with about $1 of its own money.
+
 ## How it works
 
 **Linking (once per address).**
@@ -102,7 +107,7 @@ BCH signed message. The app verifies the answer locally, then looks up the other
 | Demo page (`web/`): look up npub ⇄ address, payment link, link an address with a NIP-07 signer + pasted BCH signature | done: lookup checked in headless Chrome on the live relays; the full link flow (injected test signer → publish → lookups → payment link, an existing GitHub claim kept) checked in headless Chrome against a local relay (`?relays=ws://127.0.0.1:…`, `test/local-relay.mjs`) |
 | Try it without a wallet (`web/try.js`, `src/sign.js`): two throwaway keys made in the page run compose → sign → verify, then a copied proof, a borrowed address and an edited event are each refused | done: checked in headless Chrome (all three refused with their reasons, no network requests, no page errors, no overflow at 390 px) |
 | Login (`src/auth.js`): one-time nonce bound to the origin + expiry; answer with a Nostr kind 27235 event OR a BCH signed message; replay, wrong origin/nonce/kind, stale or expired answers refused | done: library + `web/login.html` (both paths checked in headless Chrome against a local relay; a reused signature is refused, and the page says why in plain words) |
-| On-chain commitment (`src/bchtx.js`, `src/commit.js`, `src/committx.js`, `src/bchschnorr.js`, `src/fulcrum.js`) | built and tested: all 494 Bitcoin Cash Node sighash vectors and its 13 Schnorr vectors pass; two real mainnet spends (ECDSA, Schnorr) verify; invented or swapped transactions and signatures over the wrong digest or parent are refused; a revocation hidden by one server is still seen; a disputed height gives *unknown*; the look-up page's *Check the chain* button was checked in headless Chrome against the three live servers (an address with no commitment shows "no commitment" and keeps its payment link); no commitment broadcast on mainnet yet |
+| On-chain commitment (`src/bchtx.js`, `src/commit.js`, `src/committx.js`, `src/bchschnorr.js`, `src/fulcrum.js`) | built and tested: all 494 Bitcoin Cash Node sighash vectors and its 13 Schnorr vectors pass; two real mainnet spends (ECDSA, Schnorr) verify; invented or swapped transactions and signatures over the wrong digest or parent are refused; a revocation hidden by one server is still seen; a disputed height gives *unknown*; the look-up page's *Check the chain* button was checked in headless Chrome against the three live servers (an address with no commitment shows "no commitment" and keeps its payment link); one real commitment on mainnet (block 977806, the agent's own demo address bound to its demo npub, see *Try it in one minute*), read back as bound from all three servers |
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.
 

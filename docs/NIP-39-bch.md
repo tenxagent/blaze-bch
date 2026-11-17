@@ -104,5 +104,6 @@ six public relays (`docs/live-relay-test-2026-11-15.json`).
 
 The on-chain commitment: `src/bchtx.js` (transaction bytes + FORKID digest; all 494 Bitcoin Cash Node sighash vectors), `src/commit.js`
 (format, signer check, newest-wins, precedence), `src/committx.js` (build + sign one), `src/bchschnorr.js` (BCH Schnorr; Bitcoin Cash
-Node's 13 vectors) and `src/fulcrum.js` (several servers). Two real mainnet spends, one ECDSA and one Schnorr, verify with it. No
-`N39B` commitment has been broadcast on mainnet yet.
+Node's 13 vectors) and `src/fulcrum.js` (several servers). Two real mainnet spends, one ECDSA and one Schnorr, verify with it. The
+first mainnet `N39B` commitment is in block 977806, tx `5dd5b56182ba05b7a4797c8eb142252efb5e635ff43b9272fbf8767820bdfc6c`. It binds a
+demo address to a demo npub, both held by the agent that wrote this code.
