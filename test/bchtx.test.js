@@ -49,6 +49,23 @@ test('sighashForkid matches all 494 BCHN FORKID rows (input value 0, as in their
   assert.equal(n, 494);
 });
 
+test('a REAL mainnet ECDSA signature verifies over sighashForkid with the real amount, and not with 1 sat more', async () => {
+  const { secp256k1 } = await import('@noble/curves/secp256k1.js');
+  const M = JSON.parse(readFileSync(new URL('./fixtures/mainnet-p2pkh-spend.json', import.meta.url)));
+  assert.equal(txid(hexToBytes(M.raw)), M.txid);
+  assert.equal(txid(hexToBytes(M.parentRaw)), M.parentTxid);
+  const tx = parseTx(hexToBytes(M.raw));
+  assert.equal(tx.inputs[0].prevTxid, M.parentTxid);
+  const prev = parseTx(hexToBytes(M.parentRaw)).outputs[M.vout];
+  const s = tx.inputs[0].script;
+  const sig = s.subarray(1, s[0]); // DER without the trailing hash type byte
+  const pubkey = s.subarray(2 + s[0]);
+  assert.equal(s[s[0]], 0x41, 'SIGHASH_ALL|FORKID');
+  const ok = (amount) => secp256k1.verify(sig, sighashForkid(tx, 0, prev.script, amount, 0x41), pubkey, { prehash: false, format: 'der', lowS: false });
+  assert.equal(ok(prev.value), true);
+  assert.equal(ok(prev.value + 1n), false);
+});
+
 test('sighashForkid refuses a hash type without the FORKID bit and an input index out of range', () => {
   const tx = parseTx(hexToBytes(F.rows[0][0]));
   assert.throws(() => sighashForkid(tx, 0, new Uint8Array(), 0n, 0x01), /FORKID/);
