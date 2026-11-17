@@ -25,3 +25,4 @@ a { color: var(--accent); }
 .row.wrap { flex-wrap: wrap; }
 pre { font: 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
   padding: 8px; margin: 6px 0; white-space: pre-wrap; word-break: break-all; }
+#who { overflow-wrap: anywhere; }
