@@ -194,6 +194,18 @@ test('onchainState checks a BCH Schnorr (65-byte) input 0 too: right digest acce
   assert.throws(() => onchainState(ADDR, [entry(withSchnorr(parentOut.value - 1n), 100)]), /signature does not check out/);
 });
 
+test('onchainState skips history txs that are not valid commitments (anyone can send junk to an address), not the lookup', () => {
+  const a = signed(BCH_SK, PK);
+  const junk2 = tx(OTHER_SK, commitmentScript(PK2), commitmentScript(null)); // two commitment outputs
+  const notP2pkh = parseTx(tx(OTHER_SK, commitmentScript(null)));
+  notP2pkh.inputs[0].script = Uint8Array.of(0x00, 0x51);
+  const junk3 = serializeTx(notP2pkh);
+  const junkEntry = (raw, h) => ({ txid: txid(raw), raw, height: h });
+  const s = onchainState(ADDR, [entry(a, 100), junkEntry(junk2, 105), junkEntry(junk3, 106)]);
+  assert.equal(s.state, 'bound');
+  assert.equal(s.pubkey, PK);
+});
+
 test('onchainState only takes P2PKH cashaddrs', () => {
   const p2sh = encodeCashaddr('bitcoincash', 1, hash160(new Uint8Array(1)));
   assert.throws(() => onchainState(p2sh, []), /P2PKH/);

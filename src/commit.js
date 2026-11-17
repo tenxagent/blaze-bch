@@ -97,7 +97,12 @@ export function onchainState(address, entries) {
   for (const e of entries) {
     if (txidOf(e.raw) !== e.txid) throw new Error(`commit: bytes do not hash to txid ${e.txid}`);
     const tx = parseTx(e.raw);
-    const c = readCommitment(tx);
+    let c;
+    try {
+      c = readCommitment(tx); // anyone can pay this address a tx with a malformed N39B output: that tx is simply not a commitment
+    } catch {
+      continue;
+    }
     if (!c || bytesToHex(c.signerHash) !== want) continue;
     checkSigner(tx, e.parentRaw);
     mine.push({ txid: e.txid, height: e.height, pubkey: c.pubkey });
