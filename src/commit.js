@@ -114,3 +114,22 @@ export function onchainState(address, entries) {
   const newest = confirmed.reduce((best, m) => (m.height >= best.height ? m : best));
   return { state: newest.pubkey === null ? 'revoked' : 'bound', pubkey: newest.pubkey, txid: newest.txid, height: newest.height, pending };
 }
+
+// Combines an address's on-chain state (onchainState / lookupOnchain) with the keys whose off-chain kind 10011 claim of that address
+// verifies ([{ pubkey, ... }]). The Nostr key must still claim the address off-chain; the chain adds the BCH key's own say, in block order:
+// bound to P ⇒ only P keeps it · revoked ⇒ nobody does · none ⇒ the off-chain answer stands · unknown ⇒ it stands, with checked = false.
+// Unconfirmed commitments change nothing until they confirm; they are passed through as `pending`.
+// → { keys, dropped: [{ ...key, reason }], checked, reason?, pending }
+export function applyOnchain(keys, onchain) {
+  const state = onchain?.state;
+  const pending = onchain?.pending ?? [];
+  if (state === 'none') return { keys: [...keys], dropped: [], checked: true, pending };
+  if (state === 'unknown') return { keys: [...keys], dropped: [], checked: false, reason: onchain.reason, pending };
+  if (state === 'revoked') return { keys: [], dropped: keys.map((k) => ({ ...k, reason: 'onchain-revoked' })), checked: true, pending };
+  if (state === 'bound') {
+    const keep = keys.filter((k) => k.pubkey === onchain.pubkey);
+    const dropped = keys.filter((k) => k.pubkey !== onchain.pubkey).map((k) => ({ ...k, reason: 'onchain-bound-to-another-key' }));
+    return { keys: keep, dropped, checked: true, pending };
+  }
+  throw new Error(`commit: unknown on-chain state ${JSON.stringify(state)}`);
+}
