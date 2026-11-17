@@ -31,6 +31,10 @@
     <h2>Look up</h2>
     <div class="row"><input id="q" placeholder="npub1… or bitcoincash:q…" autocomplete="off" spellcheck="false"><button id="lookup">Look up</button></div>
     <div id="lookupOut" class="out"></div>
+    <div id="chain" hidden>
+      <div class="row wrap"><button id="chainBtn" class="ghost">Check the chain</button><span class="muted">optional: asks 3 public BCH servers, which then see this address</span></div>
+      <div id="chainOut" class="out"></div>
+    </div>
     <div id="pay" hidden>
       <div class="row"><input id="amount" placeholder="amount in BCH (optional)" inputmode="decimal"><button id="payBtn" class="ghost">Payment link</button></div>
       <div id="payOut" class="out"></div>

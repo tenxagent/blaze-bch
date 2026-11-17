@@ -4,6 +4,9 @@ import { verificationText, verifyBinding } from '../src/binding.js';
 import { composeBinding } from '../src/compose.js';
 import { paymentUri } from '../src/pay.js';
 import { npubDecode, npubEncode } from '../src/bech32.js';
+import { lookupOnchain } from '../src/fulcrum.js';
+import { applyOnchain } from '../src/commit.js';
+import { chainLines } from '../src/chainview.js';
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, text, cls) => {
@@ -20,10 +23,13 @@ $('relays').textContent = `Relays: ${RELAYS.map((u) => u.replace('wss://', '')).
 
 // ---- look up: npub -> address (+ payment link), or address -> npubs ----
 let payAddress = null;
+let chainCheck = null; // [{ address, keys: [{ pubkey, npub }] }] from the last lookup, for "Check the chain"
 $('lookup').onclick = async () => {
   const q = $('q').value.trim();
   const out = $('lookupOut');
   $('pay').hidden = true;
+  $('chain').hidden = true;
+  show($('chainOut'));
   show(out, line('Asking the relays…', 'muted'));
   try {
     if (q.startsWith('npub1')) {
@@ -31,15 +37,35 @@ $('lookup').onclick = async () => {
       if (!r || !r.verified.length) return show(out, line('No verified BCH address for this npub.', 'bad'));
       payAddress = r.verified[0];
       $('pay').hidden = false;
+      chainCheck = r.verified.map((address) => ({ address, keys: [{ pubkey: r.pubkey, npub: r.npub }] }));
+      $('chain').hidden = false;
       return show(out, line('✓ Nostr signature and ✓ BCH signature both verified here.', 'ok'),
         ...r.verified.map((a) => line(a)), ...r.rejected.map((x) => line(`✗ ${x.address}: ${x.reason}`, 'bad')));
     }
     const found = await lookupByAddress(q, RELAYS);
     if (!found.length) return show(out, line('No npub currently proves this address.', 'bad'));
+    chainCheck = [{ address: q.toLowerCase(), keys: found }];
+    $('chain').hidden = false;
     show(out, line('✓ Current bindings (both signatures verified here):', 'ok'), ...found.map((x) => line(x.npub)));
   } catch (e) {
     show(out, line(`Not an npub or a cashaddr: ${e.message}`, 'bad'));
   }
+};
+
+// ---- optional: the address's own on-chain commitment (asks public Fulcrum servers only when pressed) ----
+$('chainBtn').onclick = async () => {
+  const out = $('chainOut');
+  show(out, line('Asking the BCH servers…', 'muted'));
+  const nodes = [];
+  for (const { address, keys } of chainCheck ?? []) {
+    let onchain;
+    try { onchain = await lookupOnchain(address); } catch (e) { onchain = { state: 'unknown', reason: e.message }; }
+    const applied = applyOnchain(keys, onchain);
+    if (address === payAddress && !applied.keys.length) { $('pay').hidden = true; payAddress = null; }
+    if (chainCheck.length > 1) nodes.push(line(address, 'muted'));
+    for (const l of chainLines(onchain, applied, npubEncode)) nodes.push(line(l.text, l.cls));
+  }
+  show(out, ...nodes);
 };
 
 $('payBtn').onclick = () => {
