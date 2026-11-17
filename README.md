@@ -57,6 +57,9 @@ BCH signed message. The app verifies the answer locally, then looks up the other
 | `src/auth.js` | challenge-response login with either key, and a plain-language reason for every refusal |
 | `src/sign.js` | BCH signed message + Nostr event signing, used only by the demo's throwaway-key path |
 | `bin/blaze-bch.js` | CLI: `text <npub>`, `verify <event.json>` |
+| `src/bchtx.js`, `src/bchschnorr.js` | BCH transaction bytes + FORKID signature digest; BCH Schnorr verify (on-chain commitment) |
+| `src/commit.js`, `src/committx.js` | on-chain commitment: format, signer check, newest-wins, precedence over off-chain claims; build + sign one |
+| `src/fulcrum.js` | read an address's commitments from several Electrum-protocol (Fulcrum) servers |
 | `web/` | demo pages (`index.html` try it without a wallet + look up + link, `login.html`), with exactly the noble files they load vendored |
 
 ## Trust and limits
@@ -64,8 +67,12 @@ BCH signed message. The app verifies the answer locally, then looks up the other
 - **Relays are not trusted to tell the truth.** A relay can hide events but cannot forge them, because every event and proof is verified in the
   browser. Reading several relays covers one that hides events or is stale.
 - **No server of ours** stores anything. The demo pages are static files.
-- **Revocation works by replacement.** It is only as fast as the relays that receive the newer event. A BCH-transaction commitment would give a
-  global order, and that is a stretch goal not built yet.
+- **Revocation works by replacement.** It is only as fast as the relays that receive the newer event, and only the Nostr key can do it.
+- **On-chain commitment (library only, optional).** The address's key can bind or revoke in a BCH transaction (`OP_RETURN "N39B" <pubkey>`),
+  which gives one global order ([format and precedence](docs/NIP-39-bch.md#on-chain-commitment-optional)). Servers are not trusted to tell
+  the truth: every transaction is hashed and every signature checked locally. A server can still hide a transaction or misstate its height, so the
+  library reads three servers run by different operators (`bch.imaginary.cash`, `bch.loping.net`, `fulcrum.greyh.at`), joins their histories, and
+  answers *unknown* when fewer than two answer or they disagree. The demo pages do not read the chain yet.
 - **Scope:** P2PKH addresses with compressed keys, which is what Paytaca and Electron Cash make today. Uncompressed-key signatures are refused
   with a reason. P2SH or multisig claims are out of scope.
 - The page builds the DOM only with `textContent`, so relay data is never inserted as HTML.
@@ -93,6 +100,7 @@ BCH signed message. The app verifies the answer locally, then looks up the other
 | Demo page (`web/`): look up npub ⇄ address, payment link, link an address with a NIP-07 signer + pasted BCH signature | done: lookup checked in headless Chrome on the live relays; the full link flow (injected test signer → publish → lookups → payment link, an existing GitHub claim kept) checked in headless Chrome against a local relay (`?relays=ws://127.0.0.1:…`, `test/local-relay.mjs`) |
 | Try it without a wallet (`web/try.js`, `src/sign.js`): two throwaway keys made in the page run compose → sign → verify, then a copied proof, a borrowed address and an edited event are each refused | done: checked in headless Chrome (all three refused with their reasons, no network requests, no page errors, no overflow at 390 px) |
 | Login (`src/auth.js`): one-time nonce bound to the origin + expiry; answer with a Nostr kind 27235 event OR a BCH signed message; replay, wrong origin/nonce/kind, stale or expired answers refused | done: library + `web/login.html` (both paths checked in headless Chrome against a local relay; a reused signature is refused, and the page says why in plain words) |
+| On-chain commitment (`src/bchtx.js`, `src/commit.js`, `src/committx.js`, `src/bchschnorr.js`, `src/fulcrum.js`) | built and tested: all 494 Bitcoin Cash Node sighash vectors and its 13 Schnorr vectors pass; two real mainnet spends (ECDSA, Schnorr) verify; invented or swapped transactions and signatures over the wrong digest or parent are refused; a revocation hidden by one server is still seen; a disputed height gives *unknown*; no commitment broadcast on mainnet yet |
 
 Run the tests with `npm test` (Node ≥ 22). There are two runtime dependencies, pinned exactly: `@noble/curves` 2.4.0 and `@noble/hashes` 2.4.0.
 
