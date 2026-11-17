@@ -53,7 +53,7 @@ BCH signed message. The app verifies the answer locally, then looks up the other
 | `src/binding.js` | the two-way check, with a reason for every rejected claim |
 | `src/relay.js` | publish, forward + reverse lookup, newest-wins, revocation |
 | `src/compose.js` | builds the event, keeping the user's other claims |
-| `src/pay.js` | npub → verified address → payment URI |
+| `src/pay.js` | npub → verified address → payment URI (optionally refused when the address is revoked on-chain) |
 | `src/auth.js` | challenge-response login with either key, and a plain-language reason for every refusal |
 | `src/sign.js` | BCH signed message + Nostr event signing, used only by the demo's throwaway-key path |
 | `bin/blaze-bch.js` | CLI: `text <npub>`, `verify <event.json>` |
