@@ -3,13 +3,16 @@
 //   revoke: OP_RETURN <'N39B'> <empty push>
 // The committing address is the P2PKH key that spends input 0 (unlocking script = <signature> <pubkey>). One commitment output per tx.
 // For an address, the newest CONFIRMED commitment wins, so a later tx replaces or revokes an earlier one, in block order, for everyone.
-// Signatures are not re-checked here: every BCH node checked them before the tx was mined. What this code checks: the bytes hash to
-// the txid the server named (a server cannot swap content), the commitment's exact shape, and who spent input 0.
-// A server CAN hide a tx or lie about its height ⇒ callers ask more than one server (see the README, Trust and limits).
+// A server could invent a tx, so for every commitment of the address this code checks, itself: the bytes hash to the txid the server
+// named, the parent bytes hash to input 0's outpoint, that parent output is this address's P2PKH lock, and input 0's signature
+// (ECDSA or BCH Schnorr) is valid over the FORKID digest with the parent's value and covers every output (base type ALL).
+// A server CAN still hide a tx or lie about its height ⇒ callers ask more than one server (see the README, Trust and limits).
 import { sha256 } from '@noble/hashes/sha2.js';
+import { secp256k1 } from '@noble/curves/secp256k1.js';
 import { decodeCashaddr } from './cashaddr.js';
 import { hash160 } from './bchmsg.js';
-import { txid as txidOf, parseTx } from './bchtx.js';
+import { txid as txidOf, parseTx, sighashForkid } from './bchtx.js';
+import { verifyBchSchnorr } from './bchschnorr.js';
 import { bytesToHex, hexToBytes } from './bytes.js';
 
 export const COMMIT_PREFIX = 'N39B';
@@ -64,15 +67,40 @@ export const p2pkhScript = (hash) => Uint8Array.of(0x76, 0xa9, 20, ...hash, 0x88
 // Electrum/Fulcrum address key: sha256 of the locking script, byte-reversed, hex.
 export const scripthash = (address) => bytesToHex(sha256(p2pkhScript(p2pkhHash(address))).reverse());
 
-// entries: [{ txid, raw (bytes), height }] for the address's history (height ≤ 0 = unconfirmed). Every entry is hashed and must match
-// its txid. → { state: 'none' | 'bound' | 'revoked', pubkey?, txid?, height?, pending: [unconfirmed commitments of this address] }
+// Input 0 of a commitment tx, checked against the parent output it spends. Throws with the reason; returns nothing when it holds.
+export function checkSigner(tx, parentRaw) {
+  const input = tx.inputs[0];
+  if (!(parentRaw instanceof Uint8Array) || txidOf(parentRaw) !== input.prevTxid) throw new Error('commit: parent tx missing or not the one input 0 spends');
+  const prev = parseTx(parentRaw).outputs[input.vout];
+  const s = input.script;
+  const pub = s.subarray(2 + s[0]);
+  if (!prev || bytesToHex(prev.script) !== bytesToHex(p2pkhScript(hash160(pub)))) throw new Error('commit: the parent output is not this key\'s P2PKH lock');
+  const sig = s.subarray(1, s[0]);
+  const hashType = s[s[0]];
+  const base = hashType & 0x1f;
+  if (!(hashType & 0x40) || base === 2 || base === 3) throw new Error('commit: the signature does not cover every output (needs ALL|FORKID)');
+  const digest = sighashForkid(tx, 0, prev.script, prev.value, hashType);
+  let ok = false;
+  if (sig.length === 64) ok = verifyBchSchnorr(sig, digest, pub);
+  else {
+    try { ok = secp256k1.verify(sig, digest, pub, { prehash: false, format: 'der', lowS: false }); } catch { ok = false; }
+  }
+  if (!ok) throw new Error('commit: input 0 signature does not check out');
+}
+
+// entries: [{ txid, raw (bytes), parentRaw (bytes of the tx input 0 spends), height }] for the address's history (height ≤ 0 =
+// unconfirmed). Every entry must hash to its txid; every commitment of this address must pass checkSigner (parentRaw is needed
+// only for those). → { state: 'none' | 'bound' | 'revoked', pubkey?, txid?, height?, pending: [unconfirmed commitments] }
 export function onchainState(address, entries) {
   const want = bytesToHex(p2pkhHash(address));
   const mine = [];
   for (const e of entries) {
     if (txidOf(e.raw) !== e.txid) throw new Error(`commit: bytes do not hash to txid ${e.txid}`);
-    const c = readCommitment(parseTx(e.raw));
-    if (c && bytesToHex(c.signerHash) === want) mine.push({ txid: e.txid, height: e.height, pubkey: c.pubkey });
+    const tx = parseTx(e.raw);
+    const c = readCommitment(tx);
+    if (!c || bytesToHex(c.signerHash) !== want) continue;
+    checkSigner(tx, e.parentRaw);
+    mine.push({ txid: e.txid, height: e.height, pubkey: c.pubkey });
   }
   const confirmed = mine.filter((m) => m.height > 0);
   const pending = mine.filter((m) => !(m.height > 0));

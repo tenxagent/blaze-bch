@@ -1,0 +1,96 @@
+{
+ "source": "Bitcoin Cash Node src/secp256k1/src/modules/schnorr/tests_impl.h, run_schnorr_compact_test (gitlab.com/bitcoin-cash-node/bitcoin-cash-node master, read 2026-11-17); msg = the 32-byte message the signature covers",
+ "vectors": [
+  {
+   "title": "1",
+   "pubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+   "msg": "0000000000000000000000000000000000000000000000000000000000000000",
+   "sig": "787a848e71043d280c50470e8e1532b2dd5d20ee912a45dbdd2bd1dfbf187ef67031a98831859dc34dffeedda86831842ccd0079e1f92af177f7f22cc1dced05",
+   "valid": true
+  },
+  {
+   "title": "2",
+   "pubkey": "02dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+   "msg": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+   "sig": "2a298dacae57395a15d0795ddbfd1dcb564da82b0f269bc70a74f8220429ba1d1e51a22ccec35599b8f266912281f8365ffc2d035a230434a1a64dc59f7013fd",
+   "valid": true
+  },
+  {
+   "title": "3",
+   "pubkey": "03fac2114c2fbb091527eb7c64ecb11f8021cb45e8e7809d3c0938e4b8c0e5f84b",
+   "msg": "5e2d58d8b3bcdf1abadec7829054f90dda9805aab56c77333024b9d0a508b75c",
+   "sig": "00da9b08172a9b6f0466a2defd817f2d7ab437e0d253cb5395a963866b3574be00880371d01766935b92d2ab4cd5c8a2a5837ec57fed7660773a05f0de142380",
+   "valid": true
+  },
+  {
+   "title": "4",
+   "pubkey": "03defdea4cdb677750a420fee807eacf21eb9898ae79b9768766e4faa04a2d4a34",
+   "msg": "4df3c3f68fcc83b27e9d42c90431a72499f17875c81a599b566c9889b9696703",
+   "sig": "00000000000000000000003b78ce563f89a0ed9414f5aa28ad0d96d6795f9c6302a8dc32e64e86a333f20ef56eac9ba30b7246d6d25e22adb8c6be1aeb08d49d",
+   "valid": true
+  },
+  {
+   "title": "4b",
+   "pubkey": "031b84c5567b126440995d3ed5aaba0565d71e1834604819ff9c17f5e9d5dd078f",
+   "msg": "0000000000000000000000000000000000000000000000000000000000000000",
+   "sig": "52818579aca59767e3291d91b76b637bef062083284992f2d95f564ca6cb4e3530b1da849c8e8304adc0cfe870660334b3cfc18e825ef1db34cfae3dfc5d8187",
+   "valid": true
+  },
+  {
+   "title": "6: R.y is not a quadratic residue",
+   "pubkey": "02dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+   "msg": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+   "sig": "2a298dacae57395a15d0795ddbfd1dcb564da82b0f269bc70a74f8220429ba1dfa16aee06609280a19b67a24e1977e4697712b5fd2943914ecd5f730901b4ab7",
+   "valid": false
+  },
+  {
+   "title": "7: Negated message hash, R.x mismatch",
+   "pubkey": "03fac2114c2fbb091527eb7c64ecb11f8021cb45e8e7809d3c0938e4b8c0e5f84b",
+   "msg": "5e2d58d8b3bcdf1abadec7829054f90dda9805aab56c77333024b9d0a508b75c",
+   "sig": "00da9b08172a9b6f0466a2defd817f2d7ab437e0d253cb5395a963866b3574bed092f9d860f1776a1f7412ad8a1eb50daccc222bc8c0e26b2056df2f273efdec",
+   "valid": false
+  },
+  {
+   "title": "8: Negated s, R.x mismatch",
+   "pubkey": "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+   "msg": "0000000000000000000000000000000000000000000000000000000000000000",
+   "sig": "787a848e71043d280c50470e8e1532b2dd5d20ee912a45dbdd2bd1dfbf187ef68fce5677ce7a623cb20011225797ce7a8de1dc6ccd4f754a47da6c600e59543c",
+   "valid": false
+  },
+  {
+   "title": "9: Negated P, R.x mismatch",
+   "pubkey": "03dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+   "msg": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+   "sig": "2a298dacae57395a15d0795ddbfd1dcb564da82b0f269bc70a74f8220429ba1d1e51a22ccec35599b8f266912281f8365ffc2d035a230434a1a64dc59f7013fd",
+   "valid": false
+  },
+  {
+   "title": "10: s * G = e * P, R = 0",
+   "pubkey": "02dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+   "msg": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+   "sig": "2a298dacae57395a15d0795ddbfd1dcb564da82b0f269bc70a74f8220429ba1d8c3428869a663ed1e954705b020cbb3e7bb6ac31965b9ea4c73e227b17c5af5a",
+   "valid": false
+  },
+  {
+   "title": "11: R.x not on the curve, R.x mismatch",
+   "pubkey": "02dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+   "msg": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+   "sig": "4a298dacae57395a15d0795ddbfd1dcb564da82b0f269bc70a74f8220429ba1d1e51a22ccec35599b8f266912281f8365ffc2d035a230434a1a64dc59f7013fd",
+   "valid": false
+  },
+  {
+   "title": "12: r = p",
+   "pubkey": "02dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+   "msg": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+   "sig": "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc2f1e51a22ccec35599b8f266912281f8365ffc2d035a230434a1a64dc59f7013fd",
+   "valid": false
+  },
+  {
+   "title": "13: s = n",
+   "pubkey": "02dff1d77f2a671c5f36183726db2341be58feae1da2deced843240f7b502ba659",
+   "msg": "243f6a8885a308d313198a2e03707344a4093822299f31d0082efa98ec4e6c89",
+   "sig": "2a298dacae57395a15d0795ddbfd1dcb564da82b0f269bc70a74f8220429ba1dfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141",
+   "valid": false
+  }
+ ]
+}
