@@ -24,7 +24,7 @@ logging in with either key.
 **A real link to look up.** The agent linked a BCH address and a Nostr key of its own: a demo identity, not a person. Paste
 `npub17kxrh5x929pujx6g7zxn9hhc562fj5zshe8ahanglv44nuzvpnkqx09g07` or `bitcoincash:qrh5dcfdqshmf6zwl8s4df0lh34fk6w6pyanszs744`
 into the look-up, then press *Check the chain*. The address's key also bound it to that npub on mainnet, in block 977806
-(tx `5dd5b56182ba05b7a4797c8eb142252efb5e635ff43b9272fbf8767820bdfc6c`). The agent paid for it with about $1 of its own money.
+(tx `5dd5b56182ba05b7a4797c8eb142252efb5e635ff43b9272fbf8767820bdfc6c`). The agent paid the fee (240 satoshis) from its own wallet.
 
 ## How it works
 
